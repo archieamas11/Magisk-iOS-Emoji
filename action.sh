@@ -1,22 +1,29 @@
 #!/system/bin/sh
-MODPATH="${0%/*}"
+
+export PATH="/data/adb/ksu/bin:/data/adb/magisk:/system/bin:/system/xbin:$PATH"
+
+if [ -n "$MODDIR" ] && [ -d "$MODDIR" ]; then
+    MODPATH="$MODDIR"
+else
+    MODPATH="${0%/*}"
+    [ "$MODPATH" = "$0" ] && MODPATH="$(pwd)"
+    MODPATH="$(cd "$MODPATH" 2>/dev/null && pwd)"
+fi
 
 set +o standalone 2>/dev/null
 unset ASH_STANDALONE 2>/dev/null
 
-# Validate required script exists
 SCRIPT="$MODPATH/service.sh"
 if [ ! -f "$SCRIPT" ]; then
-    echo -e "\nERROR: Missing service.sh" >&2
+    echo "Error: service.sh not found" >&2
     exit 1
 fi
 
-# Execute script with error handling
 if ! sh "$SCRIPT"; then
-    echo -e "\nERROR: service.sh failed" >&2
+    echo "Error: service.sh failed" >&2
     exit 1
 fi
 
-echo -e "\nOperation completed successfully!\n"
+echo "Service run complete"
 
 exit 0
